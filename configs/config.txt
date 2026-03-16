@@ -1,0 +1,58 @@
+https://mirrors.aliyun.com/pypi/simple/
+
+conda env remove --name  环境名称
+
+pkill -9 -f "python.*train       清空训练进程
+
+nvidia-smi --gpu-reset -i [gpu_id]
+
+看文件数量：ls | wc -l
+
+pip install nvitop
+pip install nvidia-ml-py -U
+nvitop -m auto
+nvitop -m compact
+nvitop -m full
+
+启动命令：
+service ssh start
+sleep inf
+
+发布任务训练
+在～/.badhrc里添加
+export NVIDIA_DRIVER_CAPABILITIES="${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}"
+if [ -d /lib/x86_64-linux-gnu ]; then
+    export LD_LIBRARY_PATH="/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+cd /data/your/code/ 
+source /root/anaconda3/bin/activate your_env 
+python your_code.py 
+bash your_code.sh 
+
+如果自己镜像太大
+创建一个官方镜像，然后把自己的镜像拉到envs里，保存镜像，cat C:\Users\hu\.ssh\id_ed25519.pub 这一步需要添加 .pub里的信息
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICJRsioCyDfNi6K9YNMncIQNQYDlP3MzXfT8R7Sw7+yb hu@LAPTOP-A6U47JE3
+
+上传数据
+C:\00\ads-cli --threads=32 cp "C:\Users\hu\Desktop\000" s3://019ADE50A2E67CF09D31A505971A58A2:019ADE50A2E67CE09CCFDFF3515AF3D2@202500025.aoss.cn-sh-01b.sensecoreapi-oss.cn/data/DIzhi/
+从本地或者其他地方导入数据到aoss里
+/data/L202500025/ads-cli --threads=32 cp s3://019ADE50A2E67CF09D31A505971A58A2:019ADE50A2E67CE09CCFDFF3515AF3D2@202500025.aoss-internal.cn-sh-01b.sensecoreapi-oss.cn/202500025/data2/moffusion01 /root/anaconda3/envs/moffusion01/ （导出-->导入  aoss ---->服务器）
+
+/data/L202500025/ads-cli --threads=32 cp /root/anaconda3/envs/protonmof/ s3://019ADE50A2E67CF09D31A505971A58A2:019ADE50A2E67CE09CCFDFF3515AF3D2@202500025.aoss-internal.cn-sh-01b.sensecoreapi-oss.cn/202500025/data2/protonmof/  (从服务器---->AOSS)
+
+MOF-C: A Reverse Generation Model Designed for Conductivity
+ 
+service ssh start
+1） cp /sensecore/compute/platform/ssh/ssh_config/id_rsa.pub ~/.ssh/
+2)   cp /sensecore/compute/platform/ssh/ssh_config/authorized_keys ~/.ssh/
+3） cp /sensecore/compute/platform/ssh/ssh_config/id_rsa /data/L202500025/ ---这一步改成你们自己的文件夹
+10.119.105.242
+ssh root@10.119.105.242 -i /data/L202500025/id_rsa
+
+
+
+
+
+
+
+
