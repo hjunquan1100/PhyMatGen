@@ -135,17 +135,6 @@ they contained machine-specific paths and environment names. Portable versions
 are provided in `scripts/slurm`; select an environment by setting `PYTHON` and
 provide checkpoint paths through `VAE_CKPT` or `DIT_CKPT`.
 
-## Excluded legacy code
 
-The former `CHECK` directory is not included. It was not imported by the
-training or correction pipeline, and its relevant validation logic is already
-implemented in `phymatgen_correction/src/validate_*.py`. Plotting code, debug runs, paper
-figures, duplicate experimental scripts, logs, and model weights are also
-excluded from this repository.
 
-## License and attribution
 
-See `LICENSE` for the upstream licensing terms. The generation backbone is
-derived from the All-atom Diffusion Transformers project; third-party portions
-under `src/tools/ase_notebook` and `src/models/components/equiformer_v2` retain
-their own license files.
