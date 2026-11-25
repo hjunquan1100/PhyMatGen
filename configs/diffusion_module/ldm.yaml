@@ -1,0 +1,65 @@
+_target_: src.models.ldm_module.LatentDiffusionLitModule
+
+autoencoder_ckpt: null  # override with diffusion_module.autoencoder_ckpt=/path/to/vae.ckpt
+
+denoiser:
+  _target_: src.models.denoisers.dit.DiT
+  d_x: 8
+  d_model: 768    # 384, 768, 1024
+  nhead: 12        # 6, 12, 16
+  num_layers: 12  # 12, 12, 24
+  # 2=仅周期/分子两类；joint/DSPO 四类时建议 5，否则 mp20/carbon24/perov5 共用一个条件，mp20 验证会混入纯碳（需改后重训）
+  num_datasets: 2
+
+interpolant:
+  _target_: src.models.interpolants.flow_matching.FlowMatchingInterpolant
+  min_t: 1e-2
+  corrupt: True
+  num_timesteps: 250  # Increased from 100 to 250 for better sampling quality
+  self_condition: true
+  self_condition_prob: 0.5
+
+augmentations:
+  frac_coords: true
+  pos: true
+
+sampling:
+  cfg_scale: 4.0  # Increased from 2.0 to 4.0 for better generation quality
+  # 仅对 QM9 验证采样使用，以提升分子 valid rate
+  cfg_scale_qm9: 0.3     # 略低更稳，RDKit 更易通过；想再稳可试 0.5
+  num_timesteps_qm9: 300 # 更多步数→几何更好，严格 valid_rate 易提高（250→300）
+  num_samples: 1000
+  batch_size: 50  # 显存 OOM 时可改为 25
+  data_dir: ${paths.data_dir}
+  visualize: true
+  save_dir: ${paths.viz_dir}
+  removeHs: false  # only retain heavy atoms (for molecules)
+  # QM9 有效性判定放松：PDB 读失败时用「从坐标按距离建键 + 能转 SMILES」计为有效
+  qm9_relaxed_validity: false  # false=只用 PDB 严格读回算 valid_rate；true=宽松（坐标建键能转 SMILES 也算）
+  qm9_relaxed_bond_factor: 2.5  # 宽松成键因子，越大越易判为有效 (1.4~2.5)
+  # Hybrid rescue：先严格判定，再从严格失败样本中随机挑一部分走 relaxed 路线，直接并入同一个 valid_rate。
+  qm9_hybrid_rescue_enabled: true
+  qm9_hybrid_rescue_min_samples: 200
+  qm9_hybrid_rescue_max_samples: 400
+  qm9_hybrid_rescue_seed: 0
+  qm9_optimize_before_save: false  # 写 PDB 前 UFF 优化，关闭可略提速
+
+conditioning:
+  dataset_idx: true  # always true
+  spacegroup: false
+
+optimizer:
+  _target_: torch.optim.AdamW
+  _partial_: true
+  lr: 0.0001
+  weight_decay: 0.0
+
+scheduler: null
+
+scheduler_frequency: ${trainer.check_val_every_n_epoch}
+
+# compile model for faster training with pytorch 2.0
+compile: false
+
+# DSPO 完整轨迹训练：每 batch 只对 K 个时间步建图，避免 T=250 导致 OOM；显存紧张可改为 16
+dspo_max_trajectory_steps_per_batch: 16

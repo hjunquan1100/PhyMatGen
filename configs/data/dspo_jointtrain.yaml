@@ -1,0 +1,48 @@
+# DSPO 训练：train = pt 组（四类都保留），val = joint 四类
+# 设计：四类都要求组内既有高分也有低分；mp20/perov5/carbon24 至少 2 个满分样本，qm9 至少 3 个正样本
+datamodule:
+  _target_: src.data.dspo_datamodule.DSPOJointDataModule
+  pt_root: ${dspo.pt_root}
+  # 过滤规则：四类都只保留「组内既有高分又有低分」的组
+  high_thresholds:
+    mp20: 7      # =7 视为满分高分，其余(0~6) 视为低分
+    perov5: 7    # =7 视为满分高分，其余(0~6) 视为低分
+    carbon24: 4  # =4 视为满分高分，其余(0~3) 视为低分
+    qm9: 1       # =1 高分，=0 低分；仅保留 1/0 混合组
+  min_high_counts:
+    mp20: 2
+    perov5: 2
+    carbon24: 2
+    qm9: 3      # 若想更严格可改成 4
+  batch_size: 4   # 每卡每次取 4 组；改小可增加每 epoch 的 batch 数（如 16 组/2 卡→2 batch/epoch）
+  num_workers: 0
+  joint_datamodule:
+    _target_: src.data.joint_datamodule.JointDataModule
+    # datasets 由 JointDataModule.setup() 内按 root/proportion 等手动实例化，不交给 Hydra 递归 instantiate
+    datasets:
+      mp20:
+        root: ${paths.data_dir}/mp_20
+        proportion: 1.0
+      qm9:
+        root: ${paths.data_dir}/qm9
+        removeHs: false
+        proportion: 1.0
+      qmof150:
+        root: ${paths.data_dir}/qmof
+        proportion: 0.0
+      carbon24:
+        root: ${paths.data_dir}/carbon_24
+        proportion: 1.0
+        split: all
+      perov5:
+        root: ${paths.data_dir}/perov_5
+        proportion: 1.0
+        split: all
+    batch_size:
+      train: 128
+      val: 128
+      test: 128
+    num_workers:
+      train: 8
+      val: 8
+      test: 8

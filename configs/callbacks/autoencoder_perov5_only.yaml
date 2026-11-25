@@ -1,0 +1,19 @@
+defaults:
+  - model_checkpoint
+  # - early_stopping
+  # - learning_rate_monitor
+  - _self_
+
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints  # 保存在当前运行输出目录的 checkpoints 子目录
+  filename: "vae-epoch@{epoch}-step@{step}-val_perov5_match_rate@{val_perov5/match_rate:.4f}"
+  monitor: "val_perov5/match_rate"
+  mode: "max"
+  save_top_k: 1  # 只保存最好的一个模型（最佳权重）
+  save_last: False  # 不保存最后一个 checkpoint
+  auto_insert_metric_name: False  # 设置为False，避免路径分隔符问题
+
+# early_stopping:
+#   monitor: "val/match_rate"
+#   patience: 100
+#   mode: "max"

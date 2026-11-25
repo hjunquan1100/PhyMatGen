@@ -1,0 +1,19 @@
+defaults:
+  - ema
+  - model_checkpoint
+  - _self_
+
+# 用 TQDM 白条进度条（10%|████▌），每轮一行；EpochAware 在每轮开始时刷新为当前 epoch，避免一直显示上一轮
+progress_bar:
+  _target_: src.callbacks.progress_bar.EpochAwareTQDMProgressBar
+  refresh_rate: 1
+  leave: true
+
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "dspoldm-epoch@{epoch}-step@{step}-val_valid_rate@{val_valid_rate:.4f}"
+  monitor: "val_valid_rate"
+  mode: "max"
+  save_top_k: 1
+  save_last: False
+  auto_insert_metric_name: False

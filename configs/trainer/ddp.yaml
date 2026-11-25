@@ -1,0 +1,13 @@
+defaults:
+  - default
+
+strategy: ddp
+
+# 验证阶段 barrier 前各 rank 耗时可能不均（尤其 QM9 get_metrics 慢），延长 NCCL 集合超时避免 collective timeout
+# 需配合环境变量 NCCL_BLOCKING_WAIT=1 使用
+ddp_timeout_seconds: 7200
+
+accelerator: gpu
+devices: auto
+num_nodes: 1
+sync_batchnorm: True

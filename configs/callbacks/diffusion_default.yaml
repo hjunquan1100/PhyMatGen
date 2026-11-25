@@ -1,0 +1,18 @@
+defaults:
+  - ema
+  - model_checkpoint
+  # - early_stopping
+  # - learning_rate_monitor
+  - _self_
+
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "ldm-epoch@{epoch}-step@{step}-val_qm9_valid_rate@{val_qm9/valid_rate:.4f}-val_mp20_valid_rate@{val_mp20/valid_rate:.4f}"
+  monitor: "val_mp20/valid_rate"
+  mode: "max"
+  save_last: True
+
+# early_stopping:
+#   monitor: "val/valid_rate"
+#   patience: 100
+#   mode: "max"

@@ -1,0 +1,20 @@
+defaults:
+  - model_checkpoint
+  # - early_stopping
+  # - learning_rate_monitor
+  - _self_
+
+# 保存 best 和 last 权重
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints  # 保存在当前运行输出目录的 checkpoints 子目录
+  filename: "vae-epoch@{epoch}-step@{step}-val_qm9_match_rate@{val_qm9/match_rate:.4f}"  # 与 MP20 格式一致
+  monitor: "val_qm9/match_rate"
+  mode: "max"
+  save_top_k: 1  # 只保存最好的一个模型
+  save_last: True  # 保存最后一个 checkpoint (last.ckpt)
+  # 不设置 auto_insert_metric_name，使用默认值 False，避免路径分隔符问题
+
+# early_stopping:
+#   monitor: "val/match_rate"
+#   patience: 100
+#   mode: "max"
