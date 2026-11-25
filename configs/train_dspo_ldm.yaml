@@ -1,0 +1,39 @@
+# @package _global_
+# DSPO 微调 LDM：用 pt 组（高/低分）做 advantage-weighted 训练，验证用 joint 四类
+defaults:
+  - data: dspo_jointtrain
+  - diffusion_module: ldm
+  - callbacks: diffusion_dspo
+  - logger: null
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+  - _self_
+
+name: ""
+task_name: "train_dspo_DIT"
+tags: ["dspo", "ldm", "joint"]
+train: True
+test: False
+ckpt_path: null
+seed: 9
+
+# 每轮都跑验证（默认 trainer 为每 10 轮）
+trainer:
+  check_val_every_n_epoch: 1
+
+# DSPO 组数据目录（含 pt/ 与 structures/），由命令行或 slurm 覆盖
+dspo:
+  pt_root: ${paths.data_dir}/dspo
+
+# Index 0 is reserved for classifier-free guidance. The four datasets use
+# condition labels 1 (MP20), 2 (QM9), 4 (Carbon24), and 5 (Perov5).
+diffusion_module:
+  denoiser:
+    num_datasets: 5
+
+# 双卡/多卡：用 trainer=ddp 并指定 devices，例如：
+#   python src/train_dspo_ldm.py trainer=ddp trainer.devices=2
+# 若报错或卡住，可先把验证 DataLoader 的 num_workers 关掉，避免 fork+CUDA 问题：
+#   data.datamodule.joint_datamodule.num_workers.val=0 data.datamodule.joint_datamodule.num_workers.test=0
