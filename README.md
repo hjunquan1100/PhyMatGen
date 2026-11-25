@@ -4,8 +4,7 @@ contains training, evaluation, validation, and repair code only. Datasets,
 checkpoints, generated structures, and experiment logs are intentionally not
 included.
 
-The generation backbone is derived from the All-atom Diffusion Transformers
-codebase. The `phymatgen_correction` package contains the project-specific latent-bank,
+The `phymatgen_correction` package contains the project-specific latent-bank,
 conditional DiT, global repair, masked repair, and local refinement workflow.
 
 ## Repository layout
